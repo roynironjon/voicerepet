@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hands-Free Talking Cartoon</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f0f8ff;
+    }
+
+    .cartoon {
+      position: relative;
+      width: 200px;
+      margin: 50px auto;
+    }
+
+    .head {
+      width: 200px;
+      height: 200px;
+      background-color: #ffe0b3;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .eyes {
+      position: absolute;
+      top: 50px;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .eye {
+      width: 30px;
+      height: 30px;
+      background-color: #fff;
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .pupil {
+      width: 12px;
+      height: 12px;
+      background-color: #333;
+      border-radius: 50%;
+      position: absolute;
+      top: 8px;
+      left: 9px;
+    }
+
+    .mouth {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 50px;
+      background-color: #d9534f;
+      border-radius: 0 0 50px 50px;
+    }
+
+    .mouth.talking {
+      animation: talking 0.3s infinite;
+    }
+
+    @keyframes talking {
+      0% { height: 50px; }
+      50% { height: 70px; }
+      100% { height: 50px; }
+    }
+
+    .speech {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hands-Free Talking Cartoon</h1>
+  <div class="cartoon">
+    <div class="head">
+      <div class="eyes">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+      </div>
+      <div class="mouth" id="mouth"></div>
+    </div>
+  </div>
+  <div class="speech" id="speech">The cartoon is ready...</div>
+
+  <script>
+    let recognition;
+    let isSpeaking = false;
+    let speechData = "";
+
+    function initializeSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Your browser does not support speech recognition.");
+        return null;
+      }
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.lang = 'en-US'; // Change to 'bn-BD' for Bangla
+      recognitionInstance.interimResults = false;
+      recognitionInstance.continuous = true; // Keep listening
+      return recognitionInstance;
+    }
+
+    function startListening() {
+      recognition = initializeSpeechRecognition();
+      if (!recognition) return;
+
+      const speech = document.getElementById('speech');
+      const mouth = document.getElementById('mouth');
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        speechData += transcript + " ";
+      };
+
+      recognition.onend = function () {
+        if (!isSpeaking) {
+          playbackSpeech();
+        }
+      };
+
+      recognition.onerror = function (event) {
+        console.error("Speech recognition error:", event.error);
+      };
+
+      recognition.start();
+      speech.textContent = "Listening... Speak now!";
+    }
+
+    function playbackSpeech() {
+      if (!speechData.trim()) return;
+
+      const speech = document.getElementById('speech');
+      const mouth = document.getElementById('mouth');
+
+      speech.textContent = "Playing back: " + speechData;
+      mouth.classList.add('talking');
+
+      const utterance = new SpeechSynthesisUtterance(speechData);
+      utterance.lang = 'en-US'; // Change to 'bn-BD' for Bangla
+
+      utterance.onend = function () {
+        mouth.classList.remove('talking');
+        speech.textContent = "Listening again...";
+        speechData = ""; // Clear speech data
+        startListening(); // Resume listening
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Start the system automatically
+    startListening();
+  </script>
+</body>
+</html>

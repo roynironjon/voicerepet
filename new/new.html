@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to Voice Cartoon</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f0f8ff;
+    }
+
+    .cartoon {
+      position: relative;
+      width: 200px;
+      margin: 50px auto;
+    }
+
+    .head {
+      width: 200px;
+      height: 200px;
+      background-color: #ffe0b3;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .eyes {
+      position: absolute;
+      top: 50px;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .eye {
+      width: 30px;
+      height: 30px;
+      background-color: #fff;
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .pupil {
+      width: 12px;
+      height: 12px;
+      background-color: #333;
+      border-radius: 50%;
+      position: absolute;
+      top: 8px;
+      left: 9px;
+    }
+
+    .mouth {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 50px;
+      background-color: #d9534f;
+      border-radius: 0 0 50px 50px;
+    }
+
+    .mouth.talking {
+      animation: talking 0.3s infinite;
+    }
+
+    @keyframes talking {
+      0% { height: 50px; }
+      50% { height: 70px; }
+      100% { height: 50px; }
+    }
+
+    .input-container {
+      margin-top: 20px;
+    }
+
+    .input-field {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .speech {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Text to Voice Cartoon</h1>
+  <div class="cartoon">
+    <div class="head">
+      <div class="eyes">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+      </div>
+      <div class="mouth" id="mouth"></div>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="textInput" class="input-field" placeholder="Type something here and press Enter...">
+  </div>
+
+  <div class="speech" id="speech">Waiting for input...</div>
+
+  <script>
+    const mouth = document.getElementById('mouth');
+    const speech = document.getElementById('speech');
+    const textInput = document.getElementById('textInput');
+
+    textInput.addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') {
+        const text = textInput.value.trim();
+        if (text) {
+          textInput.value = ""; // Clear input field
+          speakText(text);
+        }
+      }
+    });
+
+    function speakText(text) {
+      speech.textContent = `Speaking: ${text}`;
+      mouth.classList.add('talking');
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US'; // Change to 'bn-BD' for Bangla
+
+      utterance.onend = function () {
+        mouth.classList.remove('talking');
+        speech.textContent = "Waiting for input...";
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
