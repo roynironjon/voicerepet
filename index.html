@@ -134,6 +134,8 @@
 
       recognition.onerror = function (event) {
         console.error("Speech recognition error:", event.error);
+        speech.textContent = "Error: Please try again.";
+        startListening(); // Restart if error occurs
       };
 
       recognition.start();
@@ -146,6 +148,7 @@
       const speech = document.getElementById('speech');
       const mouth = document.getElementById('mouth');
 
+      isSpeaking = true;
       speech.textContent = "Playing back: " + speechData;
       mouth.classList.add('talking');
 
@@ -154,8 +157,9 @@
 
       utterance.onend = function () {
         mouth.classList.remove('talking');
-        speech.textContent = "Listening again...";
+        isSpeaking = false; // Set speaking status to false
         speechData = ""; // Clear speech data
+        speech.textContent = "Listening again...";
         startListening(); // Resume listening
       };
 
